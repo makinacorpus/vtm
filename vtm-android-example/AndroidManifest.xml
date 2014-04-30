@@ -73,5 +73,9 @@
       android:label="@string/title_activity_map" >
     </activity>
   </application>
+		<activity
+				android:name="org.oscim.android.test.LngLatMapActivity"
+				android:label="@string/title_activity_map">
+		</activity>
 
 </manifest>

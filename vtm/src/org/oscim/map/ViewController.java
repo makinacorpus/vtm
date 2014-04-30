@@ -62,7 +62,7 @@ public class ViewController extends Viewport {
 		mPos.y = y;
 
 		/* clamp latitude */
-		mPos.y = FastMath.clamp(mPos.y, 0, 1);
+		mPos.y = FastMath.clamp(mPos.y, 0.25,0.75);
 
 		/* wrap longitude */
 		while (mPos.x > 1)
