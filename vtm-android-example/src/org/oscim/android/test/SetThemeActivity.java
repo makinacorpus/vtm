@@ -1,22 +1,22 @@
 package org.oscim.android.test;
 
-import android.os.Bundle;
-import android.view.View;
-import org.oscim.android.MapActivity;
 import org.oscim.layers.TileGridLayer;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.source.bitmap.BitmapTileSource;
-import org.oscim.tiling.source.bitmap.DefaultSources;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
+
+import android.os.Bundle;
+import android.view.View;
 
 /**
  * Created by maven on 2014/4/30.
- *
- * Switch the map layer through the buttons at the bottom, you may find that the appliction may hung up and be no responsitive.
- *
+ * 
+ * Switch the map layer through the buttons at the bottom, you may find that the
+ * appliction may hung up and be no responsitive.
+ * 
  * It seems that it is caused by the PausedThread
  */
 public class SetThemeActivity extends BaseMapActivity {
@@ -38,7 +38,6 @@ public class SetThemeActivity extends BaseMapActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 
 		this.initVectorLayer();
 		this.initSatelliteLayer();
