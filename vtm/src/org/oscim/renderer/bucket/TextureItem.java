@@ -63,6 +63,8 @@ public class TextureItem extends Inlist<TextureItem> {
 
 	final TexturePool pool;
 
+	public boolean mipmap;
+
 	private TextureItem(TexturePool pool, int id) {
 		this(pool, id, pool.mWidth, pool.mHeight, false);
 	}
@@ -153,11 +155,14 @@ public class TextureItem extends Inlist<TextureItem> {
 
 		protected int mTexCnt = 0;
 
-		public TexturePool(int maxFill, int width, int height) {
+		private boolean mMipmaps;
+
+		public TexturePool(int maxFill, int width, int height, boolean mipmap) {
 			super(maxFill);
 			mWidth = width;
 			mHeight = height;
 			mUseBitmapPool = true;
+			mMipmaps = mipmap;
 		}
 
 		public TexturePool(int maxFill) {
@@ -262,6 +267,8 @@ public class TextureItem extends Inlist<TextureItem> {
 				int[] textureIds = GLUtils.glGenTextures(1);
 				t.id = textureIds[0];
 
+				t.mipmap |= mMipmaps;
+
 				initTexture(t);
 
 				if (dbg)
@@ -279,6 +286,9 @@ public class TextureItem extends Inlist<TextureItem> {
 				t.bitmap.uploadToTexture(true);
 			}
 
+			if (t.mipmap)
+				gl.generateMipmap(GL.TEXTURE_2D);
+
 			if (dbg)
 				GLUtils.checkGlError(TextureItem.class.getName());
 
@@ -289,8 +299,14 @@ public class TextureItem extends Inlist<TextureItem> {
 		protected void initTexture(TextureItem t) {
 			GLState.bindTex2D(t.id);
 
-			gl.texParameterf(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER,
-			                 GL.LINEAR);
+			if (t.mipmap) {
+				gl.texParameterf(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER,
+				                 GL.LINEAR_MIPMAP_LINEAR);
+			} else {
+				gl.texParameterf(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER,
+				                 GL.LINEAR);
+			}
+
 			gl.texParameterf(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER,
 			                 GL.LINEAR);
 

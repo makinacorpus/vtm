@@ -268,6 +268,7 @@ public class XmlThemeBuilder extends DefaultHandler {
 
 			} else {
 				log.error("unknown element: {}", localName);
+
 				//throw new SAXException("unknown element: " + localName);
 			}
 		} catch (SAXException e) {
@@ -398,9 +399,10 @@ public class XmlThemeBuilder extends DefaultHandler {
 			if ("id".equals(name))
 				b.style = value;
 
-			else if ("src".equals(name))
-				;// src = value;
-
+			else if ("src".equals(name)) {
+				b.texture = loadTexture(value);
+				//b.texture.mipmap = true;
+			}
 			else if ("use".equals(name))
 				;// ignore
 
@@ -455,6 +457,7 @@ public class XmlThemeBuilder extends DefaultHandler {
 			else
 				logUnknownAttribute(elementName, name, value, i);
 		}
+
 		return b.build();
 	}
 
@@ -528,16 +531,25 @@ public class XmlThemeBuilder extends DefaultHandler {
 				logUnknownAttribute(elementName, name, value, i);
 		}
 
-		if (src != null) {
-			try {
-				Bitmap bitmap = CanvasAdapter.getBitmapAsset(src);
-				if (bitmap != null)
-					b.texture = new TextureItem(bitmap, true);
-			} catch (Exception e) {
-				log.debug(e.getMessage());
-			}
-		}
+		b.texture = loadTexture(src);
+
 		return b.build();
+	}
+
+	private TextureItem loadTexture(String src) {
+		if (src == null)
+			return null;
+
+		try {
+			Bitmap bitmap = CanvasAdapter.getBitmapAsset(src);
+			if (bitmap != null) {
+				log.debug("loading {}", src);
+				return new TextureItem(bitmap, true);
+			}
+		} catch (Exception e) {
+			log.debug("missing file / {}", e.getMessage());
+		}
+		return null;
 	}
 
 	private void addOutline(String style) {
@@ -737,10 +749,10 @@ public class XmlThemeBuilder extends DefaultHandler {
 			else if ("font-family".equals(name))
 				b.fontFamily = FontFamily.valueOf(value.toUpperCase());
 
-			else if ("style".equals(name))
+			else if ("style".equals(name) || "font-style".equals(name))
 				b.fontStyle = FontStyle.valueOf(value.toUpperCase());
 
-			else if ("size".equals(name))
+			else if ("size".equals(name) || "font-size".equals(name))
 				b.fontSize = Float.parseFloat(value);
 
 			else if ("fill".equals(name))

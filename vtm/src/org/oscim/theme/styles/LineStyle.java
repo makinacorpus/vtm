@@ -21,6 +21,7 @@ import static org.oscim.backend.canvas.Color.parseColor;
 
 import org.oscim.backend.canvas.Color;
 import org.oscim.backend.canvas.Paint.Cap;
+import org.oscim.renderer.bucket.TextureItem;
 
 public final class LineStyle extends RenderStyle {
 
@@ -38,6 +39,8 @@ public final class LineStyle extends RenderStyle {
 	public final int stippleColor;
 	public final float stippleWidth;
 
+	public final TextureItem texture;
+
 	private LineStyle(LineBuilder<?> builer) {
 		this.level = builer.level;
 		this.style = builer.style;
@@ -51,6 +54,7 @@ public final class LineStyle extends RenderStyle {
 		this.stipple = builer.stipple;
 		this.stippleColor = builer.stippleColor;
 		this.stippleWidth = builer.stippleWidth;
+		this.texture = builer.texture;
 	}
 
 	public LineStyle(int level, String style, int color, float width,
@@ -70,6 +74,7 @@ public final class LineStyle extends RenderStyle {
 		this.stipple = stipple;
 		this.stippleColor = stippleColor;
 		this.stippleWidth = stippleWidth;
+		this.texture = null;
 
 		this.blur = blur;
 		this.fadeScale = fadeScale;
@@ -110,6 +115,8 @@ public final class LineStyle extends RenderStyle {
 		public int stippleColor;
 		public float stippleWidth;
 
+		public TextureItem texture;
+
 		public T set(LineStyle line) {
 			if (line == null)
 				return reset();
@@ -125,6 +132,7 @@ public final class LineStyle extends RenderStyle {
 			this.stipple = line.stipple;
 			this.stippleColor = line.stippleColor;
 			this.stippleWidth = line.stippleWidth;
+			this.texture = line.texture;
 			return self();
 		}
 
@@ -166,6 +174,16 @@ public final class LineStyle extends RenderStyle {
 			return self();
 		}
 
+		public T stippleWidth(float width) {
+			this.stippleWidth = width;
+			return self();
+		}
+
+		public T stipple(int width) {
+			this.stipple = width;
+			return self();
+		}
+
 		public T stippleColor(String color) {
 			this.stippleColor = parseColor(color);
 			return self();
@@ -187,6 +205,11 @@ public final class LineStyle extends RenderStyle {
 
 		public T fixed(boolean b) {
 			this.fixed = b;
+			return self();
+		}
+
+		public T texture(TextureItem texture) {
+			this.texture = texture;
 			return self();
 		}
 	}

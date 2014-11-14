@@ -46,7 +46,8 @@ public class TextureBucket extends RenderBucket {
 	/** pool shared by TextLayers */
 	public final static TexturePool pool = new TexturePool(POOL_FILL,
 	                                                       TEXTURE_WIDTH,
-	                                                       TEXTURE_HEIGHT);
+	                                                       TEXTURE_HEIGHT,
+	                                                       false);
 
 	public TextureBucket(int type) {
 		super(type, false, true);

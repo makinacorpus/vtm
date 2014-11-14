@@ -229,7 +229,7 @@ public class VectorTileLoader extends TileLoader implements RenderStyle.Callback
 	public void renderWay(LineStyle line, int level) {
 		int nLevel = mCurBucket + level;
 
-		if (line.stipple == 0) {
+		if (line.stipple == 0 && line.texture == null) {
 			if (line.outline && mCurLineBucket == null) {
 				log.debug("missing line for outline! " + mElement.tags
 				        + " lvl:" + level + " layer:" + mElement.layer);
@@ -241,7 +241,7 @@ public class VectorTileLoader extends TileLoader implements RenderStyle.Callback
 			if (lb.line == null) {
 				lb.line = line;
 				lb.scale = line.fixed ? 1 : mLineScale;
-				lb.setExtents(-4, Tile.SIZE + 4);
+				lb.setExtents(-16, Tile.SIZE + 16);
 			}
 
 			if (line.outline) {

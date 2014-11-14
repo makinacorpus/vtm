@@ -14,7 +14,6 @@ import static org.oscim.renderer.bucket.RenderBucket.TEXLINE;
 
 import org.oscim.backend.GL;
 import org.oscim.backend.canvas.Color;
-import org.oscim.core.MapPosition;
 import org.oscim.core.Tile;
 import org.oscim.renderer.GLMatrix;
 import org.oscim.renderer.GLViewport;
@@ -159,22 +158,21 @@ public class VectorTileRenderer extends TileRenderer {
 			return;
 		}
 
-		MapPosition pos = v.pos;
 		/* place tile relative to map position */
-		int z = tile.zoomLevel;
-		float div = FastMath.pow(z - pos.zoomLevel);
-		double tileScale = Tile.SIZE * pos.scale;
-		float x = (float) ((tile.x - pos.x) * tileScale);
-		float y = (float) ((tile.y - pos.y) * tileScale);
+		double tileScale = Tile.SIZE * v.pos.scale;
+		float x = (float) ((tile.x - v.pos.x) * tileScale);
+		float y = (float) ((tile.y - v.pos.y) * tileScale);
 
 		/* scale relative to zoom-level of this tile */
-		float scale = (float) (pos.scale / (1 << z));
+		float scale = (float) (v.pos.scale / (1 << tile.zoomLevel));
 
 		v.mvp.setTransScale(x, y, scale / COORD_SCALE);
 		v.mvp.multiplyLhs(v.viewproj);
 
 		mClipMVP.setTransScale(x, y, scale / COORD_SCALE);
 		mClipMVP.multiplyLhs(mClipProj);
+
+		float zoomDiv = FastMath.pow(tile.zoomLevel - v.pos.zoomLevel);
 
 		buckets.bind();
 
@@ -184,7 +182,7 @@ public class VectorTileRenderer extends TileRenderer {
 		for (RenderBucket b = buckets.get(); b != null;) {
 			switch (b.type) {
 				case POLYGON:
-					b = PolygonBucket.Renderer.draw(b, v, div, first);
+					b = PolygonBucket.Renderer.draw(b, v, zoomDiv, first);
 					first = false;
 					/* set test for clip to tile region */
 					gl.stencilFunc(GL.EQUAL, 0x80, 0x80);
@@ -193,7 +191,7 @@ public class VectorTileRenderer extends TileRenderer {
 					b = LineBucket.Renderer.draw(b, v, scale, buckets);
 					break;
 				case TEXLINE:
-					b = LineTexBucket.Renderer.draw(b, v, div, buckets);
+					b = LineTexBucket.Renderer.draw(b, v, zoomDiv, buckets);
 					break;
 				case MESH:
 					b = MeshBucket.Renderer.draw(b, v);
@@ -216,9 +214,9 @@ public class VectorTileRenderer extends TileRenderer {
 		}
 
 		if (debugOverdraw) {
-			if (tile.zoomLevel > pos.zoomLevel)
+			if (tile.zoomLevel > v.pos.zoomLevel)
 				PolygonBucket.Renderer.drawOver(mClipMVP, Color.BLUE, 0.5f);
-			else if (tile.zoomLevel < pos.zoomLevel)
+			else if (tile.zoomLevel < v.pos.zoomLevel)
 				PolygonBucket.Renderer.drawOver(mClipMVP, Color.RED, 0.5f);
 			else
 				PolygonBucket.Renderer.drawOver(mClipMVP, Color.GREEN, 0.5f);

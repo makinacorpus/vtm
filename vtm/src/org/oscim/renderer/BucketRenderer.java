@@ -35,6 +35,7 @@ import org.oscim.renderer.bucket.PolygonBucket;
 import org.oscim.renderer.bucket.RenderBucket;
 import org.oscim.renderer.bucket.RenderBuckets;
 import org.oscim.renderer.bucket.TextureBucket;
+import org.oscim.utils.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +114,11 @@ public class BucketRenderer extends LayerRenderer {
 					b = LineBucket.Renderer.draw(b, v, div, buckets);
 					break;
 				case TEXLINE:
-					b = LineTexBucket.Renderer.draw(b, v, div, buckets);
+					b = LineTexBucket.Renderer.draw(b,
+					                                v,
+					                                (float) FastMath.pow(layerPos.zoomLevel
+					                                        - v.pos.zoomLevel),
+					                                buckets);
 					break;
 				case MESH:
 					b = MeshBucket.Renderer.draw(b, v);

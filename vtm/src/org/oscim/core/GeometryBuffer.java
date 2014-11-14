@@ -423,4 +423,24 @@ public class GeometryBuffer {
 		return sb.toString();
 	}
 
+	public static GeometryBuffer makeCircle(float x, float y,
+	        float radius, int segments) {
+		GeometryBuffer g = new GeometryBuffer(segments, 1);
+		makeCircle(g, x, y, radius, segments);
+		return g;
+	}
+
+	public static GeometryBuffer makeCircle(GeometryBuffer g,
+	        float x, float y, float radius, int segments) {
+		g.clear();
+		g.startPolygon();
+		for (int i = 0; i < segments; i++) {
+			double rad = Math.toRadians(i * (360f / segments));
+
+			g.addPoint((float) (x + Math.cos(rad) * radius),
+			           (float) (y + Math.sin(rad) * radius));
+		}
+		return g;
+	}
+
 }

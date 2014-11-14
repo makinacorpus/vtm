@@ -17,6 +17,7 @@
 package org.oscim.renderer.bucket;
 
 import static org.oscim.backend.GLAdapter.gl;
+import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 import static org.oscim.renderer.MapRenderer.MAX_INDICES;
 import static org.oscim.renderer.MapRenderer.bindQuadIndicesVBO;
 
@@ -32,6 +33,7 @@ import org.oscim.renderer.GLUtils;
 import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.MapRenderer;
 import org.oscim.theme.styles.LineStyle;
+import org.oscim.utils.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +86,6 @@ public final class LineTexBucket extends RenderBucket {
 
 	static final Logger log = LoggerFactory.getLogger(LineTexBucket.class);
 
-	private static final float COORD_SCALE = MapRenderer.COORD_SCALE;
 	/* scale factor mapping extrusion vector to short values */
 	public static final float DIR_SCALE = 2048;
 
@@ -94,7 +95,7 @@ public final class LineTexBucket extends RenderBucket {
 	public int evenQuads;
 	public int oddQuads;
 
-	private boolean evenSegment;
+	private boolean evenSegment = true;
 
 	protected boolean mRandomizeOffset = true;
 
@@ -107,6 +108,12 @@ public final class LineTexBucket extends RenderBucket {
 
 	public void addLine(GeometryBuffer geom) {
 		addLine(geom.points, geom.index);
+	}
+
+	@Override
+	protected void clear() {
+		evenSegment = true;
+		super.clear();
 	}
 
 	public void addLine(float[] points, int[] index) {
@@ -271,7 +278,7 @@ public final class LineTexBucket extends RenderBucket {
 
 		public static void init() {
 
-			shader = new Shader("linetex_layer");
+			shader = new Shader("linetex_layer_tex");
 
 			int[] vboIds = GLUtils.glGenBuffers(1);
 			mVertexFlipID = vboIds[0];
@@ -294,11 +301,46 @@ public final class LineTexBucket extends RenderBucket {
 			              GL.STATIC_DRAW);
 			GLState.bindVertexBuffer(0);
 
-			//		mTexID = new int[10];
-			//		byte[] stipple = new byte[2];
-			//		stipple[0] = 32;
-			//		stipple[1] = 32;
-			//		mTexID[0] = GlUtils.loadStippleTexture(stipple);
+			//	mTexID = new int[10];
+			//	byte[] stipple = new byte[40];
+			//	stipple[0] = 32;
+			//	stipple[1] = 32;
+			//	mTexID[0] = loadStippleTexture(stipple);
+
+			//tex = new TextureItem(CanvasAdapter.getBitmapAsset("patterns/arrow.png"));
+			//tex.mipmap = true;
+		}
+
+		//static TextureItem tex;
+
+		public static int loadStippleTexture(byte[] stipple) {
+			int sum = 0;
+			for (byte flip : stipple)
+				sum += flip;
+
+			byte[] pixel = new byte[sum];
+
+			boolean on = true;
+			int pos = 0;
+			for (byte flip : stipple) {
+				float max = flip;
+
+				for (int s = 0; s < flip; s++) {
+					float alpha = Math.abs(s / (max - 1) - 0.5f);
+					if (on)
+						alpha = 255 * (1 - alpha);
+					else
+						alpha = 255 * alpha;
+
+					pixel[pos + s] = FastMath.clampToByte((int) alpha);
+				}
+				on = !on;
+				pos += flip;
+			}
+
+			return GLUtils.loadTexture(pixel, sum, 1, GL.ALPHA,
+			                           GL.LINEAR, GL.LINEAR,
+			                           GL.REPEAT, GL.REPEAT);
 		}
 
 		private final static int STRIDE = 12;
@@ -307,11 +349,7 @@ public final class LineTexBucket extends RenderBucket {
 		public static RenderBucket draw(RenderBucket b, GLViewport v,
 		        float div, RenderBuckets buckets) {
 
-			//if (shader == 0)
-			//	return curLayer.next;
-
 			GLState.blend(true);
-			//GLState.useProgram(shader);
 			shader.useProgram();
 
 			GLState.enableVertexArrays(-1, -1);
@@ -339,27 +377,28 @@ public final class LineTexBucket extends RenderBucket {
 			buckets.vbo.bind();
 
 			float scale = (float) v.pos.getZoomScale();
-
 			float s = scale / div;
 
-			//GL.bindTexture(GL20.TEXTURE_2D, mTexID[0]);
+			//tex.bind();
 
 			for (; b != null && b.type == TEXLINE; b = b.next) {
 				LineTexBucket lb = (LineTexBucket) b;
 				LineStyle line = lb.line.current();
 
+				if (line.texture != null)
+					line.texture.bind();
+
 				GLUtils.setColor(shader.uColor, line.stippleColor, 1);
 				GLUtils.setColor(shader.uBgColor, line.color, 1);
 
 				float pScale = (int) (s + 0.5f);
-				if (pScale < 1)
-					pScale = 1;
+				//if (pScale < 1)
+				//	pScale = 1;
 
 				gl.uniform1f(shader.uPatternScale,
-				             (MapRenderer.COORD_SCALE * line.stipple) / pScale);
+				             (COORD_SCALE * line.stipple) / pScale);
 
 				gl.uniform1f(shader.uPatternWidth, line.stippleWidth);
-				//GL.uniform1f(hScale, scale);
 
 				/* keep line width fixed */
 				gl.uniform1f(shader.uWidth, lb.width / s * COORD_SCALE_BY_DIR_SCALE);
@@ -418,7 +457,6 @@ public final class LineTexBucket extends RenderBucket {
 					gl.drawElements(GL.TRIANGLES, numIndices,
 					                GL.UNSIGNED_SHORT, 0);
 				}
-				//GlUtils.checkGlError(TAG);
 			}
 
 			gl.disableVertexAttribArray(aPos0);
@@ -426,8 +464,6 @@ public final class LineTexBucket extends RenderBucket {
 			gl.disableVertexAttribArray(aLen0);
 			gl.disableVertexAttribArray(aLen1);
 			gl.disableVertexAttribArray(aFlip);
-
-			//GL.bindTexture(GL20.TEXTURE_2D, 0);
 
 			return b;
 		}

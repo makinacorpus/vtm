@@ -71,7 +71,7 @@
   <style-line id="highway-service" use="residential" width="-0.6" />
 
   <!-- track|footway|path|cycleway -->
-  <style-line id="footway" stroke="#aaffffff" width="1.8" cap="butt" fix="true" stipple="2" stipple-width="0.6" stipple-stroke="#d35c48" />
+  <style-line id="footway" stroke="#aaffffff" width="4" cap="butt" fix="true" stipple="8" stipple-width="0.6" stipple-stroke="#d35c48" src="patterns/dot.png"/>
   <style-line id="highway:cycleway" use="footway" width="0.1" stipple-stroke="#4040ee" />
   <style-line id="highway:track" use="footway" width="0.1" stipple="3" stipple-stroke="#a39b68" />
   <style-line id="highway:path" use="footway" width="0.1" stipple="2" stipple-stroke="#837b58" />
@@ -81,7 +81,7 @@
 
   <!-- de: ein Weg der für Reiter vorgeshen ist.. -->
   <style-line id="bridleway" use="footway" stroke="#d3cb98" width="0.1" cap="butt" stipple-stroke="#837b58" />
-  <style-line id="steps" stroke="#aaffffff" width="4.2" cap="butt" fix="true" stipple="2" stipple-width="1.0" stipple-stroke="#be6253" />
+  <style-line id="steps" stroke="#aaffffff" width="4.2" cap="butt" fix="true" stipple="4" stipple-width="1.0" stipple-stroke="#be6253" src="patterns/dot.png"/>
   <style-line id="water:outline" stroke="#a4bbcc" width="1.0" fix="true" cap="butt" />
 
   <style-line id="water" stroke="#a4bbcc" width="1.0" cap="butt" fix="true" />
@@ -899,7 +899,8 @@
           <line stroke="#ddaa9988" width="1.0" cap="butt" fix="true" fade="12" />
         </m>
         <m k="railway" v="rail|turntable" zoom-min="15">
-          <line stroke="#aaa6a4" width="2.0" cap="butt" fix="true" fade="12" stipple="10" stipple-width="0.8" stipple-stroke="#ffffff" />
+         <!--    <line stroke="#aaa6a4" width="2.0" cap="butt" fix="true" fade="12" stipple="10" stipple-width="0.8" stipple-stroke="#ffffff" /> -->
+                  <line stroke="#aaa6a4" width="4.0" cap="butt" fix="true" fade="12" stipple="32" stipple-width="0.8" stipple-stroke="#ffffff" src="patterns/rail.png"/>
         </m>
 
         <!-- <m k="railway" v="rail" zoom-max="14" zoom-min="13">
