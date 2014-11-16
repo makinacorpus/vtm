@@ -49,12 +49,16 @@ public class PathLayer extends Layer {
 
 	final Worker mWorker;
 
-	public PathLayer(Map map, int lineColor, float lineWidth) {
+	public PathLayer(Map map, LineStyle style) {
 		super(map);
 		mWorker = new Worker(map);
-		mLineStyle = new LineStyle(lineColor, lineWidth, Cap.BUTT);
+		mLineStyle = style;
 		mRenderer = new RenderPath();
 		mPoints = new ArrayList<GeoPoint>();
+	}
+
+	public PathLayer(Map map, int lineColor, float lineWidth) {
+		this(map, new LineStyle(lineColor, lineWidth, Cap.BUTT));
 	}
 
 	public PathLayer(Map map, int lineColor) {

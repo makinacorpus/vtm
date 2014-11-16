@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * resolution for coordinates is 0.25 as points will be converted
  * to fixed point values.
  */
-public final class LineBucket extends RenderBucket {
+public class LineBucket extends RenderBucket {
 	static final Logger log = LoggerFactory.getLogger(LineBucket.class);
 
 	private static final float COORD_SCALE = MapRenderer.COORD_SCALE;
@@ -77,6 +77,10 @@ public final class LineBucket extends RenderBucket {
 		this.level = layer;
 	}
 
+	LineBucket(int type, boolean indexed, boolean quads) {
+		super(type, indexed, quads);
+	}
+
 	public void addOutline(LineBucket link) {
 		for (LineBucket l = outlines; l != null; l = l.outlines)
 			if (link == l)
@@ -112,7 +116,7 @@ public final class LineBucket extends RenderBucket {
 			addLine(points, null, numPoints, closed);
 	}
 
-	private void addLine(float[] points, int[] index, int numPoints, boolean closed) {
+	void addLine(float[] points, int[] index, int numPoints, boolean closed) {
 
 		boolean rounded = false;
 		boolean squared = false;
@@ -618,6 +622,9 @@ public final class LineBucket extends RenderBucket {
 			float heightOffset = 0;
 			gl.uniform1f(uLineHeight, heightOffset);
 
+			//	if (1 == 1)
+			//		return b.next;
+			//
 			for (; b != null && b.type == RenderBucket.LINE; b = b.next) {
 				LineBucket lb = (LineBucket) b;
 				LineStyle line = lb.line.current();

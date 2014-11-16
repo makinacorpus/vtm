@@ -229,12 +229,18 @@ public class VectorTileLoader extends TileLoader implements RenderStyle.Callback
 	public void renderWay(LineStyle line, int level) {
 		int nLevel = mCurBucket + level;
 
+		if (line.outline && mCurLineBucket == null) {
+			log.debug("missing line for outline! " + mElement.tags
+			        + " lvl:" + level + " layer:" + mElement.layer);
+			return;
+		}
+
+		//LineBucket lb;
+
 		if (line.stipple == 0 && line.texture == null) {
-			if (line.outline && mCurLineBucket == null) {
-				log.debug("missing line for outline! " + mElement.tags
-				        + " lvl:" + level + " layer:" + mElement.layer);
-				return;
-			}
+			//lb = mBuckets.getLineBucket(nLevel);
+			//	else
+			//		lb = mBuckets.getLineTexBucket(nLevel);
 
 			LineBucket lb = mBuckets.getLineBucket(nLevel);
 
@@ -252,6 +258,7 @@ public class VectorTileLoader extends TileLoader implements RenderStyle.Callback
 			lb.addLine(mElement);
 
 			/* keep reference for outline layer(s) */
+			//if (!(lb instanceof LineTexBucket))
 			mCurLineBucket = lb;
 
 		} else {
@@ -259,13 +266,16 @@ public class VectorTileLoader extends TileLoader implements RenderStyle.Callback
 
 			if (lb.line == null) {
 				lb.line = line;
-
-				float w = line.width;
-				if (!line.fixed)
-					w *= mLineScale;
-
-				lb.width = w;
+				lb.scale = line.fixed ? 1 : mLineScale;
+				lb.setExtents(-16, Tile.SIZE + 16);
 			}
+			//if (lb.line == null) {
+			//	lb.line = line;
+			//	float w = line.width;
+			//	if (!line.fixed)
+			//		w *= mLineScale;
+			//	lb.scale = w;
+			//}
 
 			lb.addLine(mElement);
 		}
