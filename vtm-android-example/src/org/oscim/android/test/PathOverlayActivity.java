@@ -21,9 +21,12 @@ import static org.oscim.tiling.source.bitmap.DefaultSources.STAMEN_TONER;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.PathLayer;
+import org.oscim.renderer.bucket.TextureItem;
+import org.oscim.theme.styles.LineStyle;
 
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -34,10 +37,15 @@ public class PathOverlayActivity extends BitmapTileMapActivity {
 		super(STAMEN_TONER.build());
 	}
 
+	TextureItem tex;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mBitmapLayer.tileRenderer().setBitmapAlpha(0.5f);
+
+		tex = new TextureItem(CanvasAdapter.getBitmapAsset("patterns/pike.png"));
+		tex.mipmap = true;
 
 		createLayers(1, true);
 
@@ -93,8 +101,20 @@ public class PathOverlayActivity extends BitmapTileMapActivity {
 			}
 			PathLayer pathLayer;
 			if (init) {
-				int c = Color.fade(Color.rainbow((float) (lat + 90) / 180), 0.5f);
-				pathLayer = new PathLayer(mMap, c, 6);
+				int c = Color.fade(Color.rainbow((float) (lat + 90) / 180), 0.9f);
+
+				LineStyle style = LineStyle.builder()
+				    .stippleColor(c)
+				    .stipple(24)
+				    .stippleWidth(1)
+				    .strokeWidth(12)
+				    .strokeColor(c)
+				    .fixed(true)
+				    .texture(tex)
+				    .build();
+
+				pathLayer = new PathLayer(mMap, style);
+
 				mMap.layers().add(pathLayer);
 				mPathLayers.add(pathLayer);
 			} else {

@@ -42,5 +42,5 @@ void
 main(){
   vec4 c=texture2D(tex,vec2(abs(mod(v_st.s+1.0,2.0)),(v_st.t+1.0)*0.5));
   float fuzz=fwidth(c.a);
-  gl_FragColor=c*smoothstep(0.5-fuzz,0.5+fuzz,c.a);
+  gl_FragColor=(c * u_color) *smoothstep(0.5-fuzz,0.5+fuzz,c.a);
 }
