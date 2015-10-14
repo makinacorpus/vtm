@@ -16,9 +16,6 @@
  */
 package org.oscim.layers;
 
-import static org.oscim.backend.CanvasAdapter.dpi;
-import static org.oscim.utils.FastMath.withinSquaredDist;
-
 import org.oscim.core.Tile;
 import org.oscim.event.Event;
 import org.oscim.event.Gesture;
@@ -29,6 +26,9 @@ import org.oscim.map.Map.InputListener;
 import org.oscim.map.ViewController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.oscim.backend.CanvasAdapter.dpi;
+import static org.oscim.utils.FastMath.withinSquaredDist;
 
 /**
  * Changes Viewport by handling move, fling, scale, rotation and tilt gestures.
@@ -148,7 +148,7 @@ public class MapEventLayer extends Layer implements InputListener, GestureListen
 		}
 		if (action == MotionEvent.ACTION_UP) {
 			mDown = false;
-			if (mDoubleTap && !mDragZoom && mCanScale) {
+			if (mDoubleTap && !mDragZoom && mEnableScale) {
 				float pivotX = 0, pivotY = 0;
 				if (!mFixOnCenter) {
 					pivotX = mPrevX1 - mMap.getWidth() / 2;
@@ -211,7 +211,7 @@ public class MapEventLayer extends Layer implements InputListener, GestureListen
 			mPrevY1 = y1;
 
 			/* double-tap drag zoom */
-			if (mDoubleTap && mCanScale) {
+			if (mDoubleTap && mEnableScale) {
 				/* just ignore first move event to set mPrevX/Y */
 				if (!mDown) {
 					mDown = true;
@@ -339,7 +339,7 @@ public class MapEventLayer extends Layer implements InputListener, GestureListen
 					mDoScale = true;
 				}
 			}
-			if (mCanScale && (mDoScale || mDoRotate)) {
+			if ((mDoScale || mDoRotate) && mEnableScale) {
 				scaleBy = (float) (pinchWidth / mPrevPinchWidth);
 				mPrevPinchWidth = pinchWidth;
 			}
